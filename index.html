@@ -1,20 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lv" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spogulis</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Spogulis | Groq Biometrija</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body {
+            background: #050608;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .ambient-glow {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 70vw; height: 70vw;
+            background: radial-gradient(circle, rgba(165, 180, 252, 0.05) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(100px); z-index: -1;
+        }
+        .glass-panel {
+            background: rgba(15, 17, 23, 0.7);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 2rem;
+        }
+        #scanner-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; border-radius: 1rem;
+        }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
-<body>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="leaderboard.html">Leaderboard</a>
-        <a href="docs.html">Docs</a>
+<body class="antialiased">
+
+    <div class="ambient-glow"></div>
+
+    <nav class="max-w-fit mx-auto mt-8 px-6 py-3 glass-panel flex space-x-8 text-[10px] font-bold tracking-[0.3em] uppercase z-50 sticky top-8">
+        <button onclick="switchTab('mirror')" id="tab-mirror" class="text-white border-b border-white/50 pb-1">Analīze</button>
+        <button onclick="switchTab('stats')" id="tab-stats" class="text-gray-500 hover:text-gray-300 transition-all">Vēsture</button>
+        <button onclick="switchTab('docs')" id="tab-docs" class="text-gray-500 hover:text-gray-300 transition-all">Projekts</button>
     </nav>
-    <main>
-        <h1>Spogulis main page</h1>
-        <p>This will hold the look submission functionality.</p>
+
+    <main class="max-w-3xl mx-auto mt-12 p-6">
+        
+        <section id="view-mirror" class="view-section active text-center">
+            <div class="glass-panel p-10 flex flex-col items-center">
+                <h1 class="text-2xl font-light tracking-widest mb-10 opacity-90">S P O G U L I S</h1>
+
+                <div class="relative w-full max-w-sm aspect-[4/5] bg-black/40 rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
+                    <img id="preview-image" class="w-full h-full object-cover hidden" alt="Seja">
+                    <canvas id="scanner-canvas" class="hidden"></canvas>
+                    
+                    <div id="loading-overlay" class="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center hidden z-20">
+                        <div class="w-8 h-8 border border-indigo-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <span class="text-[9px] tracking-[0.5em] uppercase text-indigo-300 animate-pulse">Groq Procesēšana...</span>
+                    </div>
+
+                    <label id="upload-label" class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all">
+                        <div class="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center mb-4">
+                            <span class="text-xl font-thin">+</span>
+                        </div>
+                        <span class="text-[9px] text-gray-500 tracking-[0.3em] uppercase">Augšupielādēt Portretu</span>
+                        <input type="file" id="image-upload" accept="image/*" class="hidden">
+                    </label>
+                </div>
+
+                <div class="w-full max-w-xs mt-10 space-y-6">
+                    <input type="text" id="user-name" placeholder="SUBJEKTA VĀRDS" class="w-full bg-transparent border-b border-white/10 py-2 text-center text-xs tracking-widest focus:border-indigo-400 outline-none transition-all uppercase">
+                    <button onclick="startAnalysis()" id="analyze-btn" class="w-full py-4 glass-panel hover:bg-white/10 text-[10px] tracking-[0.4em] uppercase font-bold transition-all border-indigo-500/20">
+                        Sākt Analīzi
+                    </button>
+                </div>
+            </div>
+
+            <div id="results-panel" class="mt-8 glass-panel p-10 hidden text-left flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-shrink-0 text-center">
+                    <div id="score-text" class="text-6xl font-thin text-indigo-300">0</div>
+                    <div class="text-[8px] text-gray-500 uppercase tracking-[0.3em] mt-2">Indekss</div>
+                </div>
+                <div id="ai-feedback" class="text-sm text-gray-400 font-light leading-relaxed border-l border-white/5 pl-8"></div>
+            </div>
+        </section>
+
+        <section id="view-stats" class="view-section">
+            <div id="stats-grid" class="space-y-4"></div>
+        </section>
+
+        <section id="view-docs" class="view-section">
+            <div class="glass-panel p-10 prose prose-invert font-light text-sm text-gray-400">
+                <h2 class="text-white font-normal tracking-wide">Projekta Dokumentācija</h2>
+                <p><strong>Autori:</strong> Markuss S., Nils P.</p>
+                <p>Šī sistēma izmanto Groq Llama-3.2 Vision modeli, lai veiktu ātru sejas morfoloģisko analīzi. Analīze balstās uz žokļa līnijas, acu simetrijas un kaulu struktūras novērtējumu.</p>
+            </div>
+        </section>
     </main>
+
+    <script>
+        const GROQ_KEY = "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";
+        let currentBase64 = null;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${tabId}`).classList.add('active');
+            if(tabId === 'stats') loadStats();
+        }
+
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                currentBase64 = ev.target.result;
+                const img = document.getElementById('preview-image');
+                img.src = currentBase64;
+                img.classList.remove('hidden');
+                document.getElementById('upload-label').classList.add('opacity-0');
+                document.getElementById('results-panel').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function startAnalysis() {
+            if (!currentBase64) return alert("Pievieno attēlu!");
+            
+            const loading = document.getElementById('loading-overlay');
+            loading.classList.remove('hidden');
+            
+            const prompt = `Analizē sejas morfoloģiju. Esi kritisks un objektīvs. 
+            Novērtē: žokļa līniju, acu simetriju, vaigu kaulus.
+            Atbildi TIKAI kā JSON objektu: {"score": 1-100, "analysisHtml": "īsziņa latviski"}`;
+
+            try {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.2-11b-vision-preview",
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    { type: "text", text: prompt },
+                                    { type: "image_url", image_url: { url: currentBase64 } }
+                                ]
+                            }
+                        ],
+                        response_format: { type: "json_object" },
+                        temperature: 0.5
+                    })
+                });
+
+                const result = await response.json();
+                const aiData = JSON.parse(result.choices[0].message.content);
+                
+                displayResults(aiData);
+                saveStats(aiData.score);
+            } catch (err) {
+                console.error(err);
+                alert("Savienojuma kļūda ar Groq. Pārliecinies, vai nav CORS ierobežojumu.");
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('results-panel').classList.remove('hidden');
+            document.getElementById('ai-feedback').innerHTML = data.analysisHtml;
+            
+            let val = 0;
+            const target = data.score;
+            const anim = setInterval(() => {
+                if(val >= target) clearInterval(anim);
+                document.getElementById('score-text').innerText = val;
+                val++;
+            }, 15);
+
+            drawBiometrics();
+        }
+
+        function drawBiometrics() {
+            const canvas = document.getElementById('scanner-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            canvas.classList.remove('hidden');
+
+            ctx.strokeStyle = 'rgba(165, 180, 252, 0.4)';
+            ctx.lineWidth = 1;
+            
+            // Viduslīnija
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, 0); ctx.lineTo(canvas.width/2, canvas.height);
+            ctx.stroke();
+
+            // Horizontālās proporcijas
+            for(let i=1; i<4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(canvas.width*0.2, canvas.height*(i*0.25));
+                ctx.lineTo(canvas.width*0.8, canvas.height*(i*0.25));
+                ctx.stroke();
+            }
+        }
+
+        function saveStats(score) {
+            const history = JSON.parse(localStorage.getItem('groq_history') || '[]');
+            history.unshift({
+                name: document.getElementById('user-name').value || "Subjekts",
+                score: score,
+                date: new Date().toLocaleDateString('lv-LV')
+            });
+            localStorage.setItem('groq_history', JSON.stringify(history.slice(0, 10)));
+        }
+
+        function loadStats() {
+            const history = JSON.parse(localStorage.getItem('groq_history') || '[]');
+            const grid = document.getElementById('stats-grid');
+            grid.innerHTML = history.map(item => `
+                <div class="glass-panel p-4 flex justify-between items-center px-8">
+                    <span class="text-[10px] tracking-widest uppercase opacity-60">${item.date}</span>
+                    <span class="text-sm font-bold tracking-widest">${item.name}</span>
+                    <span class="text-indigo-400 font-bold">${item.score}</span>
+                </div>
+            `).join('');
+        }
+    </script>
 </body>
 </html>
