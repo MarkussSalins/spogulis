@@ -11,10 +11,14 @@
             theme: {
                 extend: {
                     colors: {
-                        cyber: {
-                            blue: '#00f3ff',
-                            dark: '#0a0a0f',
-                            panel: 'rgba(16, 20, 28, 0.75)'
+                        glass: {
+                            border: 'rgba(255, 255, 255, 0.1)',
+                            highlight: 'rgba(255, 255, 255, 0.15)',
+                            bg: 'rgba(20, 22, 28, 0.4)'
+                        },
+                        accent: {
+                            soft: '#a5b4fc', // Maigs, difūzs zils/lillā
+                            light: '#e0e7ff'
                         }
                     },
                     fontFamily: {
@@ -25,30 +29,76 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap');
         
         body {
-            background-color: #050505;
-            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #050505 70%);
-            color: #e2e8f0;
+            background-color: #090a0f;
+            color: #f1f5f9;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Glassmorphism & Neon Effects */
+        /* Diffused Ambient Lighting */
+        .ambient-light-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(165, 180, 252, 0.12) 0%, rgba(0,0,0,0) 60%);
+            filter: blur(90px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-light-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(0,0,0,0) 60%);
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Premium Glassmorphism */
         .glass-panel {
-            background: theme('colors.cyber.panel');
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 243, 255, 0.05);
-            border-radius: 1rem;
+            background: theme('colors.glass.bg');
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid theme('colors.glass.border');
+            border-top: 1px solid theme('colors.glass.highlight');
+            border-left: 1px solid theme('colors.glass.highlight');
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            border-radius: 1.5rem;
         }
 
-        .neon-glow {
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+        .glass-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .glass-input:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        .neon-border {
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
         /* Circular Progress */
@@ -61,14 +111,14 @@
         /* Nav Tab Transition */
         .view-section {
             display: none;
-            animation: fadeIn 0.4s ease-out forwards;
+            animation: fadeIn 0.5s ease-out forwards;
         }
         .view-section.active {
             display: block;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -84,71 +134,78 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased overflow-x-hidden">
+<body class="font-sans antialiased">
 
-    <nav class="glass-panel mx-auto max-w-5xl mt-6 p-4 flex justify-between items-center sticky top-4 z-50">
-        <div class="text-2xl font-bold text-cyber-blue neon-glow tracking-widest">SPOGULIS</div>
+    <div class="ambient-light-1"></div>
+    <div class="ambient-light-2"></div>
+
+    <nav class="glass-panel mx-auto max-w-5xl mt-6 p-4 flex flex-col md:flex-row justify-between items-center sticky top-4 z-50">
+        <div class="text-xl font-bold text-white tracking-widest mb-4 md:mb-0 opacity-90">S P O G U L I S</div>
         <div class="flex space-x-2 md:space-x-6">
-            <button onclick="switchTab('mirror')" id="tab-mirror" class="nav-btn px-4 py-2 text-cyber-blue border-b-2 border-cyber-blue transition-all">Analīze</button>
-            <button onclick="switchTab('stats')" id="tab-stats" class="nav-btn px-4 py-2 text-gray-400 hover:text-white transition-all">Statistika</button>
-            <button onclick="switchTab('docs')" id="tab-docs" class="nav-btn px-4 py-2 text-gray-400 hover:text-white transition-all">Dokumentācija</button>
+            <button onclick="switchTab('mirror')" id="tab-mirror" class="nav-btn px-4 py-2 text-white border-b-2 border-white/50 transition-all">Analīze</button>
+            <button onclick="switchTab('stats')" id="tab-stats" class="nav-btn px-4 py-2 text-gray-500 hover:text-gray-300 transition-all">Statistika</button>
+            <button onclick="switchTab('docs')" id="tab-docs" class="nav-btn px-4 py-2 text-gray-500 hover:text-gray-300 transition-all">Dokumentācija</button>
         </div>
     </nav>
 
     <main class="max-w-5xl mx-auto mt-8 p-4 mb-20">
 
         <section id="view-mirror" class="view-section active space-y-8">
-            <div class="glass-panel p-6 md:p-8">
-                <h1 class="text-3xl font-bold mb-6">Sistēmas Inicializācija</h1>
+            <div class="glass-panel p-6 md:p-10">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-light tracking-wide text-white opacity-90">Inicializācija</h1>
+                    <p class="text-sm text-gray-400 mt-2">Augšupielādējiet sejas attēlu, lai veiktu ģeometrisko un morfoloģisko analīzi.</p>
+                </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="space-y-5">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">Gemini API Atslēga (Tikai lokālai lietošanai)</label>
-                            <input type="password" id="api-key" placeholder="AIzaSy..." class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-white focus:outline-none focus:border-cyber-blue transition-colors">
+                            <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Sistēmas Atslēga</label>
+                            <input type="password" id="api-key" value="AIzaSyC36d8h8wIp53GpuRPtSAlWh2ySQAYoPDY" class="w-full glass-input rounded-lg p-3 text-white outline-none transition-colors" readonly>
+                            <p class="text-xs text-gray-500 mt-1">Atslēga ir iestatīta automātiski.</p>
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">Subjekta Vārds</label>
-                            <input type="text" id="user-name" placeholder="Ievadi vārdu..." class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-white focus:outline-none focus:border-cyber-blue transition-colors">
+                            <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Subjekta Vārds</label>
+                            <input type="text" id="user-name" placeholder="Ievadi vārdu..." class="w-full glass-input rounded-lg p-3 text-white outline-none transition-colors">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">Augšupielādēt Fotogrāfiju (Portrets)</label>
-                            <input type="file" id="image-upload" accept="image/*" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-cyber-blue file:text-black file:font-bold hover:file:bg-cyan-400 transition-colors">
+                            <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Fotogrāfija</label>
+                            <input type="file" id="image-upload" accept="image/*" class="w-full glass-input rounded-lg p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-white/10 file:text-white file:font-medium hover:file:bg-white/20 transition-all cursor-pointer">
                         </div>
                         
-                        <button onclick="startAnalysis()" id="analyze-btn" class="w-full mt-4 bg-transparent border-2 border-cyber-blue text-cyber-blue font-bold py-3 px-4 rounded hover:bg-cyber-blue hover:text-black transition-all neon-border">
-                            SĀKT ANALĪZI
+                        <button onclick="startAnalysis()" id="analyze-btn" class="w-full mt-6 glass-button text-white font-medium tracking-wide py-4 px-4 rounded-xl">
+                            SĀKT SKENĒŠANU
                         </button>
                     </div>
 
-                    <div class="relative flex flex-col items-center justify-center bg-black/50 border border-gray-700 rounded-lg min-h-[300px] overflow-hidden">
+                    <div class="relative flex flex-col items-center justify-center bg-black/20 border border-white/5 rounded-2xl min-h-[350px] overflow-hidden shadow-inner">
                         <img id="preview-image" class="max-h-[400px] object-contain hidden" alt="Preview">
                         <canvas id="scanner-canvas" class="hidden"></canvas>
-                        <div id="loading-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center hidden">
-                            <div class="w-12 h-12 border-4 border-cyber-blue border-t-transparent rounded-full animate-spin"></div>
-                            <p class="mt-4 text-cyber-blue animate-pulse">Apstrādā biometriskos datus...</p>
+                        <div id="loading-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center hidden">
+                            <div class="w-12 h-12 border-2 border-accent-soft border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p class="text-accent-soft font-light tracking-widest text-sm">ANALIZĒ DATUS...</p>
                         </div>
-                        <p id="placeholder-text" class="text-gray-600">Nav augšupielādēts attēls</p>
+                        <p id="placeholder-text" class="text-gray-500 font-light">Nav attēla</p>
                     </div>
                 </div>
             </div>
 
-            <div id="results-panel" class="glass-panel p-6 md:p-8 hidden">
-                <h2 class="text-2xl font-bold mb-6 text-center">Analīzes Rezultāti</h2>
-                <div class="flex flex-col md:flex-row items-center gap-8">
+            <div id="results-panel" class="glass-panel p-6 md:p-10 hidden">
+                <h2 class="text-2xl font-light tracking-wide mb-8 text-center text-white/90">Skenēšanas Rezultāti</h2>
+                <div class="flex flex-col md:flex-row items-center gap-10">
                     <div class="relative w-48 h-48 flex-shrink-0">
-                        <svg class="w-full h-full" viewBox="0 0 120 120">
-                            <circle cx="60" cy="60" r="54" fill="none" stroke="#1f2937" stroke-width="8" />
-                            <circle id="score-circle" class="progress-ring__circle" cx="60" cy="60" r="54" fill="none" stroke="#00f3ff" stroke-width="8" stroke-dasharray="339.292" stroke-dashoffset="339.292" stroke-linecap="round" />
+                        <svg class="w-full h-full drop-shadow-lg" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6" />
+                            <circle id="score-circle" class="progress-ring__circle" cx="60" cy="60" r="54" fill="none" stroke="#a5b4fc" stroke-width="6" stroke-dasharray="339.292" stroke-dashoffset="339.292" stroke-linecap="round" />
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="score-text" class="text-5xl font-bold text-white">0</span>
-                            <span class="text-xs text-cyber-blue mt-1 uppercase tracking-widest">Vērtējums</span>
+                            <span id="score-text" class="text-5xl font-light text-white">0</span>
+                            <span class="text-[10px] text-gray-400 mt-2 uppercase tracking-widest">Indekss</span>
                         </div>
                     </div>
                     
                     <div class="flex-grow w-full">
-                        <div id="ai-feedback" class="prose prose-invert prose-cyan max-w-none text-gray-300">
+                        <div id="ai-feedback" class="prose prose-invert max-w-none text-gray-300 font-light leading-relaxed">
                             </div>
                     </div>
                 </div>
@@ -156,66 +213,76 @@
         </section>
 
         <section id="view-stats" class="view-section">
-            <div class="glass-panel p-6 md:p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold">Datu Bāze</h1>
-                    <button onclick="clearStats()" class="text-red-400 hover:text-red-300 text-sm border border-red-900 rounded px-3 py-1">Dzēst Vēsturi</button>
+            <div class="glass-panel p-6 md:p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-light tracking-wide text-white/90">Datu Bāze</h1>
+                    <button onclick="clearStats()" class="text-red-400/70 hover:text-red-400 text-xs uppercase tracking-wider border border-red-400/20 rounded-md px-4 py-2 hover:bg-red-400/10 transition-all">Dzēst Vēsturi</button>
                 </div>
                 
-                <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     </div>
-                <div id="no-stats-msg" class="text-center text-gray-500 py-10">
-                    Vēl nav veikta neviena analīze.
+                <div id="no-stats-msg" class="text-center text-gray-500 font-light py-16">
+                    Sistēmā nav saglabātu ierakstu.
                 </div>
             </div>
         </section>
 
         <section id="view-docs" class="view-section">
-            <div class="glass-panel p-6 md:p-8 space-y-10">
-                <h1 class="text-3xl font-bold mb-6 border-b border-gray-700 pb-4">Projekta Dokumentācija</h1>
+            <div class="glass-panel p-6 md:p-10 space-y-12">
+                <div class="border-b border-white/10 pb-6">
+                    <h1 class="text-3xl font-light tracking-wide text-white/90 mb-2">Gudrais spogulis ārējā izskata pilnveidošanā</h1>
+                    <p class="text-gray-400 text-sm">Autori: Markuss S., Nils P.</p>
+                </div>
                 
-                <div>
-                    <h2 class="text-xl font-bold text-cyber-blue mb-3">1. Ideja un koncepcija</h2>
-                    <p class="text-gray-300 leading-relaxed">
-                        "Spogulis" ir progresīva tīmekļa lietotne (SPA), kas izmanto ģeneratīvo mākslīgo intelektu, lai analizētu cilvēka sejas struktūru balstoties uz estētikas un ortodontijas rādītājiem (looksmaxxing kritērijiem). Mērķis ir sniegt objektīvu, uz datiem balstītu atgriezenisko saiti par sejas harmoniju, izceļot stiprās puses un jomas, kur vizuālo izskatu varētu pilnveidot.
+                <div class="space-y-4">
+                    <h2 class="text-xl font-medium text-accent-soft tracking-wide">1. Problēmas izpēte un analīze</h2>
+                    
+                    <h3 class="text-md font-medium text-white/80 mt-4">Izpētes metodes:</h3>
+                    <ul class="list-disc pl-5 text-gray-300 font-light space-y-1">
+                        <li>Personīgā pieredze un analīze;</li>
+                        <li>Nozares izpēte saistītajos interneta forumos;</li>
+                        <li>Vispārējā nozares izpēte;</li>
+                        <li>Tirgus izpēte;</li>
+                        <li>Nozares zinātniskās terminoloģijas analīze.</li>
+                    </ul>
+
+                    <h3 class="text-md font-medium text-white/80 mt-4">Izpētes process 5 soļos:</h3>
+                    <ol class="list-decimal pl-5 text-gray-300 font-light space-y-2">
+                        <li>No rīta, gatavojoties dienai, es paskatījos spogulī un saskāros ar problēmu.</li>
+                        <li>Pēc tam es iegāju r/looksmaxxing, lai atrastu noderīgu informāciju par izskata uzlabošanu. Sapratu, ka redzēt cilvēkus, kas izskatās sliktāk, uzlabo pašpārliecinātību, tomēr Reddit platformā saskāros ar negatīviem lietotājiem, kuru argumenti nebija konstruktīvi.</li>
+                        <li>Es izvēlējos pajautāt Gemini, lai tas novērtē manu izskatu un potenciālu, taču tas mani nespēja novērtēt kritiski, jo ir trenēts dot tikai pozitīvus novērtējumus, kā arī tam nav atsauces punkta, tāpēc rezultāts bija neobjektīvs.</li>
+                        <li>Es izmēģināju aplikācijas no Play Store. “LooksMax AI - get your rating” nekur neminēja maksas funkcijas, taču, lai iegūtu rezultātus, man vajadzēja maksāt. Es biju nonācis viņu datubāzē, bet mans izskata reitings vēl jo projām nebija zināms.</li>
+                        <li>Identificēju lielāko problēmu, kas bija izskata kritēriji. Daudzi kritērija ir pārāk vispārīgi un liek domāt, ka aplikācija ir kaut kāds ChatGPT. Kritēriji kā Midface ratio, Facial width-to-height ratio, Chin to philtrum ratio, Gonial angle, Canthal tilt, Facial fifths tiek apvienoti zem viena kritērija - masculinity, kas ir pilnīgi neizpalīdzīgi.</li>
+                    </ol>
+
+                    <h3 class="text-md font-medium text-white/80 mt-4">Izpētes dati:</h3>
+                    <p class="text-gray-300 font-light leading-relaxed">
+                        Izpētes dati pielikumā. Ģeometriskās morfoloģijas analīzes rezultāti, vizualizējot sejas orientiera punktu variācijas atkarībā no pievilcības vērtējumiem, kur sarkanie punkti apzīmē vidējo formu, zaļie — deformēto formu, bet zilās bultiņas norāda variācijas virzienu no −2 SD (zems pievilcības vērtējums) līdz +2 SD (augsts pievilcības vērtējums).<br><br>
+                        Attēls ilustrē looksmaxxing kvantitatīvās izskata novērtēšanas konceptus, tostarp sejas platuma-augstuma attiecības (fWHR: 1.58–1.81) mērījumus, statistisko korelāciju starp vīriešu pievilcību un sociālo tīklu aktivitāti (attractiveness = 16.8 · ln(like%) + 52.3), Norwood matu izkrišanas skalu, deguna morfoloģijas klasifikāciju pēc ģeogrāfiskās izcelsmes, sejas skeleta anatomijas analīzi.
                     </p>
                 </div>
 
-                <div>
-                    <h2 class="text-xl font-bold text-cyber-blue mb-3">2. Tehniskā arhitektūra</h2>
-                    <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center mb-4">
-                        <div class="flex items-center space-x-4 text-gray-400">
-                            <div class="text-center"><div class="w-16 h-16 bg-gray-700 rounded flex items-center justify-center mb-2">HTML5/JS</div><span class="text-xs">Client (Browser)</span></div>
-                            <div>➜</div>
-                            <div class="text-center"><div class="w-16 h-16 bg-cyan-900/50 border border-cyber-blue rounded flex items-center justify-center mb-2 text-cyber-blue">API</div><span class="text-xs">JSON Request</span></div>
-                            <div>➜</div>
-                            <div class="text-center"><div class="w-16 h-16 bg-purple-900/50 border border-purple-500 rounded flex items-center justify-center mb-2 text-purple-400">Gemini</div><span class="text-xs">LLM Engine</span></div>
-                        </div>
-                    </div>
-                    <ul class="list-disc pl-5 text-gray-300 space-y-1">
-                        <li><strong>Frontend:</strong> Vanilla JavaScript, TailwindCSS (lietotāja saskarne).</li>
-                        <li><strong>Datu apstrāde:</strong> Lokālā attēla konversija uz Base64 formātu un HTML5 Canvas režģa vizualizācijai.</li>
-                        <li><strong>Intelekts:</strong> Google Generative AI (Gemini 1.5 Flash) API ar specializētu promptu JSON formāta atbildēm.</li>
-                        <li><strong>Saglabāšana:</strong> Pārlūka `localStorage` sesijas vēstures uzturēšanai.</li>
-                    </ul>
-                </div>
+                <div class="space-y-4">
+                    <h2 class="text-xl font-medium text-accent-soft tracking-wide pt-6 border-t border-white/5">2. Programmatūras prasību specifikācija (Sākumposms)</h2>
+                    
+                    <h3 class="text-md font-medium text-white/80 mt-4">Mērķauditorija un tās vajadzības:</h3>
+                    <p class="text-gray-300 font-light leading-relaxed">
+                        Mērķauditorija ir vīrieši 16 - 30 gadu vecuma grupā, kas interesējas par ārējā izskata estētiku un tā pilnveidošanu. Mērķauditorijai pietrūkst veida, kā objektīvi novērtēt savu izskatu. Cilvēki interneta forumos var būt neobjektīvi un nepietiekami kritiski, kā arī tajos dotie padomi var būt neaktuāli atsevišķos gadījumos.
+                    </p>
 
-                <div>
-                    <h2 class="text-xl font-bold text-cyber-blue mb-3">3. Izstrādes procesa galerija</h2>
-                    <p class="text-gray-300 mb-2">Sākotnēji tika izstrādāts drūmais UI režīms, pēc tam integrēta Canvas funkcionalitāte "LED skenēšanas" efktam. Visbeidzot tika pielāgots Gemini API prompts detalizētai analīzei.</p>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="aspect-video bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs text-gray-500">[UI Mockup]</div>
-                        <div class="aspect-video bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs text-gray-500">[API Tests]</div>
-                        <div class="aspect-video bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs text-gray-500">[Canvas Render]</div>
-                    </div>
-                </div>
+                    <h3 class="text-md font-medium text-white/80 mt-4">Produkta apraksts:</h3>
+                    <p class="text-gray-300 font-light leading-relaxed">
+                        Spogulis ar paslēptu kameru un displeju, kurš nosaka cik labi cilvēks izskatās, pēc konkrētiem kritērijiem. Kamera un Led režģis zem spoguļa virsmas nodrošina acu sekošanu, lai novietotu teksta elementus uz ekrāna. Ar mini datoru tiek nodrošināta funkcionalitāte un savienojumu ar telefona aplikāciju.
+                    </p>
 
-                <div>
-                    <h2 class="text-xl font-bold text-cyber-blue mb-3">4. Nākotnes plāni</h2>
-                    <ul class="list-disc pl-5 text-gray-300 space-y-1">
-                        <li><strong>AI Konsultants:</strong> Čata interfeiss, kurā var uzdot jautājumus par to, kā uzlabot konkrētus sejas aspektus.</li>
-                        <li><strong>Sociālo tīklu integrācija:</strong> Iespēja dalīties ar savu "skenēšanas" kartīti Instagram vai TikTok.</li>
-                        <li><strong>Sejas landmarku modelis:</strong> Pāreja no ģeneriskā API uz MediaPipe, lai precīzi atzīmētu katru pikseli ap acīm un žokli reāllaikā.</li>
+                    <h3 class="text-md font-medium text-white/80 mt-4">Funkciju apraksts:</h3>
+                    <ul class="list-disc pl-5 text-gray-300 font-light space-y-2">
+                        <li><strong>Izskata novērtēšana</strong> - Pēc noteiktiem kritērijiem nosaka sejas izskatu un iedod kopējo novērtējumu.</li>
+                        <li><strong>Reāllaika vizualizācija</strong> - Pārklāj informāciju sejai, līdzīgi snapchat/ tiktok filtram.</li>
+                        <li><strong>Sinhronizācija ar aplikāciju</strong> - Tiek fiksēta izskata un vizuālās veselības statistika. Aplikācijas ikdienas pārskats piemērs: Daily Pictures.</li>
+                        <li><strong>Seju filtrs</strong> - Norāda konkrētas sejas kuras tiek analizētas un pārējās neanalizē.</li>
+                        <li><strong>Rīta rutīna un higiēna</strong> - Taimeris zobu tīrīšanai vai paraugs, kur esi un neesi noskuvies.</li>
+                        <li><strong>Strādā ar mājdzīvniekiem</strong> - Turot kaķi vai suni pie spoguļa uzrāda statistiku par dzīvniekiem.</li>
                     </ul>
                 </div>
             </div>
@@ -223,24 +290,22 @@
     </main>
 
     <script>
-        // --- 1. SPA Navigācija ---
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-cyber-blue', 'border-b-2', 'border-cyber-blue');
-                el.classList.add('text-gray-400');
+                el.classList.remove('text-white', 'border-b-2', 'border-white/50');
+                el.classList.add('text-gray-500');
             });
 
             document.getElementById(`view-${tabId}`).classList.add('active');
             
             const activeBtn = document.getElementById(`tab-${tabId}`);
-            activeBtn.classList.remove('text-gray-400');
-            activeBtn.classList.add('text-cyber-blue', 'border-b-2', 'border-cyber-blue');
+            activeBtn.classList.remove('text-gray-500');
+            activeBtn.classList.add('text-white', 'border-b-2', 'border-white/50');
 
             if (tabId === 'stats') loadStats();
         }
 
-        // --- 2. Attēla priekšskatījums ---
         const imageUpload = document.getElementById('image-upload');
         const previewImage = document.getElementById('preview-image');
         const placeholderText = document.getElementById('placeholder-text');
@@ -258,15 +323,12 @@
                 previewImage.src = currentBase64;
                 previewImage.classList.remove('hidden');
                 placeholderText.classList.add('hidden');
-                canvas.classList.add('hidden'); // Paslēpt canvas līdz analīzei
-                
-                // Paslēpt iepriekšējos rezultātus, ja tiek augšupielādēts jauns
+                canvas.classList.add('hidden');
                 document.getElementById('results-panel').classList.add('hidden');
             };
             reader.readAsDataURL(file);
         });
 
-        // --- 3. Animācijas un Canvas (LED Režģis) ---
         function animateScore(targetScore) {
             const circle = document.getElementById('score-circle');
             const text = document.getElementById('score-text');
@@ -275,7 +337,6 @@
             
             circle.style.strokeDasharray = `${circumference} ${circumference}`;
             
-            // Animējam skaitli
             let current = 0;
             const duration = 1500;
             const interval = 20;
@@ -290,59 +351,59 @@
                 text.textContent = Math.round(current);
             }, interval);
 
-            // Animējam apli
             setTimeout(() => {
                 const offset = circumference - (targetScore / 100) * circumference;
                 circle.style.strokeDashoffset = offset;
             }, 50);
         }
 
-        function drawLEDGrid() {
+        function drawSoftGrid() {
             canvas.width = previewImage.clientWidth;
             canvas.height = previewImage.clientHeight;
             canvas.classList.remove('hidden');
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Zīmē "HUD" stila rāmīšus, lai simulētu sejas atpazīšanu
-            ctx.strokeStyle = '#00f3ff';
-            ctx.lineWidth = 2;
+            // Stikla / difūzais efekts līnijām
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(165, 180, 252, 0.5)';
             
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
             const w = canvas.width;
             const h = canvas.height;
 
-            // Galvenais sejas rāmis (simulēts)
-            ctx.strokeRect(cx - w*0.25, cy - h*0.3, w*0.5, h*0.6);
-            
-            // Acu zona (simulēta)
-            ctx.strokeRect(cx - w*0.2, cy - h*0.05, w*0.15, h*0.08); // Kreisā
-            ctx.strokeRect(cx + w*0.05, cy - h*0.05, w*0.15, h*0.08); // Labā
-
-            // Trešdaļu līnijas
-            ctx.setLineDash([5, 5]);
-            ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
+            // Maigi sejas marķieri
             ctx.beginPath();
-            ctx.moveTo(0, cy - h*0.2); ctx.lineTo(w, cy - h*0.2); // Uzacu līnija
-            ctx.moveTo(0, cy + h*0.15); ctx.lineTo(w, cy + h*0.15); // Deguna pamatne
+            ctx.roundRect(cx - w*0.25, cy - h*0.3, w*0.5, h*0.6, 20);
             ctx.stroke();
-            ctx.setLineDash([]); // Atiestata
+            
+            ctx.beginPath(); ctx.roundRect(cx - w*0.2, cy - h*0.05, w*0.15, h*0.08, 10); ctx.stroke();
+            ctx.beginPath(); ctx.roundRect(cx + w*0.05, cy - h*0.05, w*0.15, h*0.08, 10); ctx.stroke();
 
-            // Punktu iezīmes (žokļa simulācija)
-            ctx.fillStyle = '#00f3ff';
-            ctx.beginPath(); ctx.arc(cx - w*0.2, cy + h*0.2, 4, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(cx + w*0.2, cy + h*0.2, 4, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(cx, cy + h*0.3, 4, 0, Math.PI*2); ctx.fill(); // Zods
+            ctx.setLineDash([4, 6]);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(0, cy - h*0.2); ctx.lineTo(w, cy - h*0.2);
+            ctx.moveTo(0, cy + h*0.15); ctx.lineTo(w, cy + h*0.15);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Maigi punkti (žoklis, zods)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath(); ctx.arc(cx - w*0.2, cy + h*0.2, 3, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + w*0.2, cy + h*0.2, 3, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx, cy + h*0.3, 3, 0, Math.PI*2); ctx.fill();
         }
 
-        // --- 4. Gemini API Integrācija ---
         async function startAnalysis() {
             const apiKey = document.getElementById('api-key').value.trim();
             const userName = document.getElementById('user-name').value.trim() || 'Nezināms';
             
-            if (!apiKey) return alert("Lūdzu, ievadi Gemini API atslēgu!");
-            if (!currentBase64) return alert("Lūdzu, augšupielādē attēlu!");
+            if (!apiKey) return alert("Sistēmas atslēga nav atrasta.");
+            if (!currentBase64) return alert("Lūdzu, augšupielādējiet attēlu!");
 
             const loading = document.getElementById('loading-overlay');
             const analyzeBtn = document.getElementById('analyze-btn');
@@ -351,19 +412,18 @@
             loading.classList.remove('hidden');
             analyzeBtn.disabled = true;
 
-            // Sagatavojam bāzi API
             const base64Data = currentBase64.split(',')[1];
 
-            const promptText = `Tu esi izskata pilnveidošanas (looksmaxxing) AI eksperts. Analizē doto sejas attēlu pēc šiem kritērijiem:
+            const promptText = `Tu esi izskata pilnveidošanas (looksmaxxing) AI eksperts. Novērtē attēlu un kritiski analizē šos kritērijus (kā prasīts projekta izpētē, neesi pārlieku pozitīvs, bet gan analītisks):
             1. Sejas kaulu struktūra un harmonija (Midface Ratio, Gonial Angle, Vaigu kauli, Zoda projekcija).
             2. Acu zona (Canthal Tilt, UEE, Uzacu kauls).
             3. Proporcijas un simetrija (Trešdaļu likums, Filtra garums).
             4. Mīkstie audi un kopšana (Āda, Matu līnija, Tauku procents).
             
-            SVARĪGI: Atgriez TIKAI formatētu JSON objektu bez cita teksta (bez markdown block quotes). JSON formāts:
+            Atgriez TIKAI JSON:
             {
-                "score": <skaitlis no 1 līdz 100, novērtējums>,
-                "analysisHtml": "<h3>Struktūra</h3><p>...</p><h3>Acu zona</h3><p>...</p> (Īss, kodolīgs HTML teksts ar tavu atzinumu latviešu valodā par redzamo, izceļot stiprās puses un trūkumus atbilstoši kritērijiem)"
+                "score": <skaitlis no 1 līdz 100, reālistisks novērtējums>,
+                "analysisHtml": "<h3>Struktūra</h3><p>...</p><h3>Acu zona</h3><p>...</p>"
             }`;
 
             try {
@@ -380,43 +440,37 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("API kļūda: " + response.statusText);
+                if (!response.ok) throw new Error("API savienojuma kļūda: " + response.statusText);
 
                 const data = await response.json();
                 let resultText = data.candidates[0].content.parts[0].text;
                 
-                // Tīram JSON no Markdown (ja AI to tomēr pievieno)
                 resultText = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const resultObj = JSON.parse(resultText);
 
-                // Saglabājam datus
                 saveToLocalStorage(userName, resultObj.score, currentBase64);
 
-                // Parādām rezultātus
                 loading.classList.add('hidden');
                 analyzeBtn.disabled = false;
                 resultsPanel.classList.remove('hidden');
                 
+                // Pielāgojam HTML izskatu (Tailwind prose stils tiks pielietots)
                 document.getElementById('ai-feedback').innerHTML = resultObj.analysisHtml;
-                drawLEDGrid();
+                drawSoftGrid();
                 
-                // Reset score circle before animating
                 document.getElementById('score-circle').style.strokeDashoffset = 339.292;
                 setTimeout(() => animateScore(resultObj.score), 100);
 
             } catch (error) {
                 console.error(error);
-                alert("Kļūda analizējot attēlu. Pārbaudi API atslēgu vai mēģini citu attēlu. Detaļas: " + error.message);
+                alert("Kļūda analizējot datus. " + error.message);
                 loading.classList.add('hidden');
                 analyzeBtn.disabled = false;
             }
         }
 
-        // --- 5. Datu Glabāšana (LocalStorage) ---
         function saveToLocalStorage(name, score, imageBase64) {
-            let history = JSON.parse(localStorage.getItem('spogulis_stats')) || [];
-            
-            // Lai nepārslogotu localStorage (kvota ~5MB), saglabāsim tikai mazus thumbnail vai noņemsim vecākos
+            let history = JSON.parse(localStorage.getItem('spogulis_stats_v2')) || [];
             if(history.length > 9) history.pop(); 
 
             history.unshift({
@@ -426,13 +480,13 @@
                 timestamp: new Date().toLocaleString('lv-LV')
             });
             
-            localStorage.setItem('spogulis_stats', JSON.stringify(history));
+            localStorage.setItem('spogulis_stats_v2', JSON.stringify(history));
         }
 
         function loadStats() {
             const grid = document.getElementById('stats-grid');
             const noDataMsg = document.getElementById('no-stats-msg');
-            let history = JSON.parse(localStorage.getItem('spogulis_stats')) || [];
+            let history = JSON.parse(localStorage.getItem('spogulis_stats_v2')) || [];
 
             grid.innerHTML = '';
             
@@ -445,17 +499,17 @@
 
             history.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'bg-gray-800/80 border border-gray-700 rounded-lg p-4 flex items-center space-x-4 hover:border-cyber-blue transition-colors';
+                card.className = 'glass-panel p-5 flex items-center space-x-5 hover:bg-white/5 transition-all cursor-default';
                 
                 card.innerHTML = `
-                    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-cyber-blue flex-shrink-0">
+                    <div class="w-16 h-16 rounded-full overflow-hidden border border-white/20 flex-shrink-0 shadow-lg">
                         <img src="${item.imageData}" class="w-full h-full object-cover" alt="Thumb">
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-lg">${item.name}</h3>
-                        <p class="text-xs text-gray-400">${item.timestamp}</p>
+                        <h3 class="font-medium text-white/90 text-lg">${item.name}</h3>
+                        <p class="text-xs text-gray-400 font-light">${item.timestamp}</p>
                     </div>
-                    <div class="text-2xl font-bold text-cyber-blue neon-glow">
+                    <div class="text-3xl font-light text-accent-soft">
                         ${item.score}
                     </div>
                 `;
@@ -465,7 +519,7 @@
 
         function clearStats() {
             if(confirm("Vai tiešām dzēst visu statistiku?")) {
-                localStorage.removeItem('spogulis_stats');
+                localStorage.removeItem('spogulis_stats_v2');
                 loadStats();
             }
         }
